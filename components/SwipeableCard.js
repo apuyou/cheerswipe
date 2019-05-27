@@ -12,99 +12,84 @@ import {
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
+const SWIPE_LEFT = 0,
+  SWIPE_RIGHT = 1;
+
 class SwipeableCard extends React.Component {
-  constructor() {
-    super();
-    this.panResponder;
-    this.state = {
-      Xposition: new Animated.Value(0),
-      RightText: false,
-      LeftText: false,
-    };
-    this.Card_Opacity = new Animated.Value(1);
+  panResponder = null;
+
+  state = {
+    delta: new Animated.ValueXY(),
+    opacity: new Animated.Value(1),
+    swipeRight: false,
+    swipeLeft: false,
+  };
+
+  gestureDirection(gestureState) {
+    if (Math.abs(gestureState.vx) > 1) {
+      return gestureState.vx > 0 ? SWIPE_RIGHT : SWIPE_LEFT;
+    }
+    if (Math.abs(gestureState.dx) > SCREEN_WIDTH - 200) {
+      return gestureState.dx > SCREEN_WIDTH - 200 ? SWIPE_RIGHT : SWIPE_LEFT;
+    }
+    return null;
   }
 
   componentWillMount() {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponderCapture: () => true,
       onPanResponderMove: (evt, gestureState) => {
-        this.state.Xposition.setValue(gestureState.dx);
-        if (gestureState.dx > SCREEN_WIDTH - 250) {
-          this.setState({
-            RightText: true,
-            LeftText: false,
-          });
-        } else if (gestureState.dx < -SCREEN_WIDTH + 250) {
-          this.setState({
-            LeftText: true,
-            RightText: false,
-          });
-        }
+        this.state.delta.setValue({ x: gestureState.dx, y: gestureState.dy });
+        this.setState({
+          swipeRight: gestureState.dx > SCREEN_WIDTH - 200,
+          swipeLeft: gestureState.dx < -SCREEN_WIDTH + 200,
+        });
       },
       onPanResponderRelease: (evt, gestureState) => {
-        if (
-          gestureState.dx < SCREEN_WIDTH - 150 &&
-          gestureState.dx > -SCREEN_WIDTH + 150
-        ) {
+        const direction = this.gestureDirection(gestureState);
+        if (direction !== null) {
+          Animated.parallel(
+            [
+              Animated.timing(this.state.delta.x, {
+                toValue:
+                  direction === SWIPE_RIGHT ? SCREEN_WIDTH : -SCREEN_WIDTH,
+                duration: 200,
+              }),
+              Animated.timing(this.state.opacity, {
+                toValue: 0,
+                duration: 200,
+              }),
+            ],
+            { useNativeDriver: true }
+          ).start(() => {
+            this.setState({ swipeLeft: false, swipeRight: false }, () => {
+              this.props.removeCard();
+            });
+          });
+        } else {
           this.setState({
-            LeftText: false,
-            RightText: false,
+            swipeLeft: false,
+            swipeRight: false,
           });
           Animated.spring(
-            this.state.Xposition,
+            this.state.delta,
             {
-              toValue: 0,
-              speed: 5,
-              bounciness: 10,
+              toValue: { x: 0, y: 0 },
+              speed: 10,
+              bounciness: 8,
             },
             { useNativeDriver: true }
           ).start();
-        } else if (gestureState.dx > SCREEN_WIDTH - 150) {
-          Animated.parallel(
-            [
-              Animated.timing(this.state.Xposition, {
-                toValue: SCREEN_WIDTH,
-                duration: 200,
-              }),
-              Animated.timing(this.Card_Opacity, {
-                toValue: 0,
-                duration: 200,
-              }),
-            ],
-            { useNativeDriver: true }
-          ).start(() => {
-            this.setState({ LeftText: false, RightText: false }, () => {
-              this.props.removeCard();
-            });
-          });
-        } else if (gestureState.dx < -SCREEN_WIDTH + 150) {
-          Animated.parallel(
-            [
-              Animated.timing(this.state.Xposition, {
-                toValue: -SCREEN_WIDTH,
-                duration: 200,
-              }),
-              Animated.timing(this.Card_Opacity, {
-                toValue: 0,
-                duration: 200,
-              }),
-            ],
-            { useNativeDriver: true }
-          ).start(() => {
-            this.setState({ LeftText: false, RightText: false }, () => {
-              this.props.removeCard();
-            });
-          });
         }
       },
     });
   }
 
   render() {
-    const rotateCard = this.state.Xposition.interpolate({
+    const rotateCard = this.state.delta.x.interpolate({
       inputRange: [-200, 0, 200],
       outputRange: ['-20deg', '0deg', '20deg'],
     });
@@ -113,31 +98,32 @@ class SwipeableCard extends React.Component {
       <Animated.View
         {...this.panResponder.panHandlers}
         style={[
-          styles.card_Style,
+          styles.card,
           {
             backgroundColor: this.props.item.backgroundColor,
-            opacity: this.Card_Opacity,
+            opacity: this.state.opacity,
             transform: [
-              { translateX: this.state.Xposition },
+              { translateX: this.state.delta.x },
+              { translateY: this.state.delta.y },
               { rotate: rotateCard },
             ],
           },
         ]}
       >
-        <Text style={styles.Card_Title}> {this.props.item.card_Title} </Text>
-        {this.state.LeftText ? (
-          <Text style={styles.Left_Text_Style}> Left Swipe </Text>
-        ) : null}
-        {this.state.RightText ? (
-          <Text style={styles.Right_Text_Style}> Right Swipe </Text>
-        ) : null}
+        <Text style={styles.cardTitle}>{this.props.item.title}</Text>
+        {this.state.swipeLeft && (
+          <Text style={styles.leftSwipe}>Left Swipe</Text>
+        )}
+        {this.state.swipeRight && (
+          <Text style={styles.rightSwipe}>Right Swipe</Text>
+        )}
       </Animated.View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  card_Style: {
+  card: {
     width: '75%',
     height: '45%',
     justifyContent: 'center',
@@ -145,11 +131,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 7,
   },
-  Card_Title: {
+  cardTitle: {
     color: '#fff',
     fontSize: 24,
   },
-  Left_Text_Style: {
+  leftSwipe: {
     top: 22,
     right: 32,
     position: 'absolute',
@@ -158,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     backgroundColor: 'transparent',
   },
-  Right_Text_Style: {
+  rightSwipe: {
     top: 22,
     left: 32,
     position: 'absolute',
