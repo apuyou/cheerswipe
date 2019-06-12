@@ -1,6 +1,14 @@
 import React from 'react';
-import { Platform, StyleSheet, View, Button } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Image,
+  Text,
+} from 'react-native';
 import { AuthSession } from 'expo';
+import clap from '../assets/images/clap.jpg';
 
 const CLIENT_ID =
   'ca21ee5548526ae665427d30fc632b40cb253cd6b9d081fcdc1a505a1b534dbf';
@@ -9,7 +17,17 @@ export default class SigninScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Button title="Signin to Product Hunt" onPress={this._handleSignin} />
+        <Image source={clap} style={styles.bgImage} />
+        <View style={styles.login}>
+          <Text style={styles.logo}>👏 Cheer Up!</Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={this._handleSignin}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.loginText}>LOGIN WITH PRODUCT HUNT</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -24,7 +42,7 @@ export default class SigninScreen extends React.Component {
         `&scope=public+private+write`,
     });
 
-    if (result.params.code) {
+    if (result.params && result.params.code) {
       const accessReq = await fetch(
         'https://jwpak61m9g.execute-api.us-east-1.amazonaws.com/dev/token',
         {
@@ -47,9 +65,34 @@ export default class SigninScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 20 : 0,
+  },
+  login: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bgImage: {
+    position: 'absolute',
+    height: '120%',
+    resizeMode: 'contain',
+  },
+  logo: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  loginButton: {
+    marginTop: 50,
+    backgroundColor: '#da552f',
+    borderRadius: 3,
+    width: '80%',
+    padding: 13,
+  },
+  loginText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
