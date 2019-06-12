@@ -19,7 +19,11 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "fr.puyou.cheerup"
+    },
+    "android": {
+      "package": "fr.puyou.cheerup"
     }
   }
 }
