@@ -13,6 +13,7 @@
   "dependencies": {
     "@expo/samples": "2.1.1",
     "apollo-cache-inmemory": "^1.6.0",
+    "apollo-cache-persist": "^0.1.1",
     "apollo-client": "^2.6.0",
     "apollo-link-http": "^1.5.14",
     "expo": "^32.0.0",
