@@ -19,7 +19,9 @@ export default class SigninScreen extends React.Component {
       <View style={styles.container}>
         <Image source={clap} style={styles.bgImage} />
         <View style={styles.login}>
-          <Text style={styles.logo}>👏 Cheer Up!</Text>
+          <Text style={styles.logo}>👏</Text>
+          <Text style={styles.logo}>Cheerswipe</Text>
+          <Text style={styles.tagline}>Swipe to give a cheer!</Text>
           <TouchableOpacity
             style={styles.loginButton}
             onPress={this._handleSignin}
@@ -71,8 +73,9 @@ const styles = StyleSheet.create({
   },
   login: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    paddingBottom: 60,
   },
   bgImage: {
     position: 'absolute',
@@ -84,8 +87,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  tagline: {
+    fontSize: 20,
+    color: '#fff',
+  },
   loginButton: {
-    marginTop: 50,
+    marginTop: 40,
     backgroundColor: '#da552f',
     borderRadius: 3,
     width: '80%',
