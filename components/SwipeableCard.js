@@ -7,6 +7,8 @@ import {
   Text,
   Dimensions,
   Animated,
+  Image,
+  ImageBackground,
   PanResponder,
 } from 'react-native';
 
@@ -23,6 +25,7 @@ class SwipeableCard extends React.Component {
     opacity: new Animated.Value(1),
     swipeRight: false,
     swipeLeft: false,
+    mediaIndex: 0,
   };
 
   gestureDirection(gestureState) {
@@ -94,13 +97,15 @@ class SwipeableCard extends React.Component {
       outputRange: ['-20deg', '0deg', '20deg'],
     });
 
+    const { item } = this.props;
+    const { mediaIndex } = this.state;
+
     return (
       <Animated.View
         {...this.panResponder.panHandlers}
         style={[
           styles.card,
           {
-            backgroundColor: this.props.item.backgroundColor,
             opacity: this.state.opacity,
             transform: [
               { translateX: this.state.delta.x },
@@ -108,9 +113,18 @@ class SwipeableCard extends React.Component {
               { rotate: rotateCard },
             ],
           },
+          this.state.delta.x > 0 ? styles.cardShadow : {},
         ]}
       >
-        <Text style={styles.cardTitle}>{this.props.item.title}</Text>
+        <Image
+          source={{ uri: item.media[mediaIndex].url }}
+          style={{ width: '100%', height: '80%' }}
+        />
+        {item.thumbnail && (
+          <Image style={styles.image} source={{ uri: item.thumbnail.url }} />
+        )}
+        <Text style={styles.name}>{this.props.item.name}</Text>
+        <Text style={styles.tagline}>{this.props.item.tagline}</Text>
         {this.state.swipeLeft && (
           <Text style={styles.leftSwipe}>Left Swipe</Text>
         )}
@@ -124,16 +138,33 @@ class SwipeableCard extends React.Component {
 
 const styles = StyleSheet.create({
   card: {
-    width: '75%',
-    height: '45%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '85%',
+    height: '80%',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
     position: 'absolute',
     borderRadius: 7,
+    backgroundColor: '#ccc',
+    padding: 10,
   },
-  cardTitle: {
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
+  },
+  image: {
+    width: 50,
+    height: 50,
+  },
+  name: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 36,
+    fontWeight: 'bold',
+  },
+  tagline: {
+    color: '#fff',
+    fontSize: 20,
   },
   leftSwipe: {
     top: 22,

@@ -9,62 +9,40 @@ import {
   View,
 } from 'react-native';
 import SwipeableCard from '../components/SwipeableCard';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
-export default class HomeScreen extends React.Component {
+class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
-  state = {
-    cards: [
-      {
-        id: 1,
-        title: 'Card 1',
-        backgroundColor: '#FFC107',
-      },
-      {
-        id: 2,
-        title: 'Card 2',
-        backgroundColor: '#ED2525',
-      },
-      {
-        id: 3,
-        title: 'Card 3',
-        backgroundColor: '#E7088E',
-      },
-      {
-        id: 4,
-        title: 'Card 4',
-        backgroundColor: '#00BCD4',
-      },
-      {
-        id: 5,
-        title: 'Card 5',
-        backgroundColor: '#FFFB14',
-      },
-    ].reverse(),
-  };
-
   removeCard = id => () => {
-    this.setState(state => ({
-      cards: state.cards.filter(card => card.id !== id),
-    }));
+    // this.setState(state => ({
+    //   cards: state.cards.filter(card => card.id !== id),
+    // }));
   };
 
   render() {
-    const { cards } = this.state;
+    const cards = this.props.data.posts
+      ? this.props.data.posts.edges.map(post => post.node)
+      : null;
 
     return (
       <View style={styles.container}>
-        {cards.map((item, key) => (
-          <SwipeableCard
-            key={key}
-            item={item}
-            removeCard={this.removeCard(item.id)}
-          />
-        ))}
-        {cards.length === 0 && (
+        {cards &&
+          cards.map((item, key) => (
+            <SwipeableCard
+              key={key}
+              item={item}
+              removeCard={this.removeCard(item.id)}
+            />
+          ))}
+        {cards && cards.length === 0 && (
           <Text style={{ fontSize: 22, color: '#000' }}>No more cards</Text>
+        )}
+        {cards === null && (
+          <Text style={{ fontSize: 22, color: '#000' }}>Loading…</Text>
         )}
       </View>
     );
@@ -80,3 +58,23 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 20 : 0,
   },
 });
+
+export default graphql(gql`
+  query allPosts {
+    posts(last: 5) {
+      edges {
+        node {
+          id
+          name
+          tagline
+          media {
+            url
+          }
+          thumbnail {
+            url
+          }
+        }
+      }
+    }
+  }
+`)(HomeScreen);
