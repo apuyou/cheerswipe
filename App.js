@@ -97,6 +97,7 @@ export default class App extends React.Component {
   _loadResourcesAsync = async () => {
     return Promise.all([
       Asset.loadAsync([require('./assets/images/clap.jpg')]),
+      Asset.loadAsync([require('./assets/images/logo.png')]),
     ]);
   };
 

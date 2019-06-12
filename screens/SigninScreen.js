@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { AuthSession } from 'expo';
 import clap from '../assets/images/clap.jpg';
+import logo from '../assets/images/logo.png';
 
 const CLIENT_ID =
   'ca21ee5548526ae665427d30fc632b40cb253cd6b9d081fcdc1a505a1b534dbf';
@@ -19,8 +20,8 @@ export default class SigninScreen extends React.Component {
       <View style={styles.container}>
         <Image source={clap} style={styles.bgImage} />
         <View style={styles.login}>
-          <Text style={styles.logo}>👏</Text>
-          <Text style={styles.logo}>Cheerswipe</Text>
+          <Image source={logo} style={styles.logo} />
+          <Text style={styles.name}>Cheerswipe</Text>
           <Text style={styles.tagline}>Swipe to give a cheer!</Text>
           <TouchableOpacity
             style={styles.loginButton}
@@ -83,6 +84,11 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   logo: {
+    width: 80,
+    height: 80,
+    margin: -14,
+  },
+  name: {
     fontSize: 48,
     fontWeight: 'bold',
     color: '#fff',

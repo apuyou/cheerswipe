@@ -2,6 +2,7 @@
   "expo": {
     "name": "Cheerswipe",
     "slug": "cheerswipe",
+    "scheme": "cheerswipe",
     "primaryColor": "#da552f",
     "privacy": "public",
     "sdkVersion": "32.0.0",
@@ -12,7 +13,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -20,7 +21,8 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "fr.puyou.cheerswipe"
+      "bundleIdentifier": "fr.puyou.cheerswipe",
+      "buildNumber": "3"
     },
     "android": {
       "package": "fr.puyou.cheerswipe"
