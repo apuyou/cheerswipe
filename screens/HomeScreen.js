@@ -17,7 +17,6 @@ class HomeScreen extends React.Component {
   };
 
   render() {
-    console.log(this.props.data);
     const goals = this.props.data.goals
       ? this.props.data.goals.edges.map(goals => goals.node)
       : null;
@@ -60,7 +59,6 @@ export default graphql(gql`
         node {
           title
           id
-          createdAt
           cheerCount
           user {
             profileImage
