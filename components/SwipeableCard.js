@@ -1,18 +1,14 @@
-import React, { Component } from 'react';
-
+import React from 'react';
 import {
-  Platform,
-  StyleSheet,
-  View,
   Text,
+  StyleSheet,
   Dimensions,
   Animated,
-  Image,
-  ImageBackground,
   PanResponder,
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const SWIPE_TRIGGER = 250;
 
 const SWIPE_LEFT = 0,
   SWIPE_RIGHT = 1;
@@ -32,8 +28,10 @@ class SwipeableCard extends React.Component {
     if (Math.abs(gestureState.vx) > 1) {
       return gestureState.vx > 0 ? SWIPE_RIGHT : SWIPE_LEFT;
     }
-    if (Math.abs(gestureState.dx) > SCREEN_WIDTH - 200) {
-      return gestureState.dx > SCREEN_WIDTH - 200 ? SWIPE_RIGHT : SWIPE_LEFT;
+    if (Math.abs(gestureState.dx) > SCREEN_WIDTH - SWIPE_TRIGGER) {
+      return gestureState.dx > SCREEN_WIDTH - SWIPE_TRIGGER
+        ? SWIPE_RIGHT
+        : SWIPE_LEFT;
     }
     return null;
   }
@@ -47,8 +45,8 @@ class SwipeableCard extends React.Component {
       onPanResponderMove: (evt, gestureState) => {
         this.state.delta.setValue({ x: gestureState.dx, y: gestureState.dy });
         this.setState({
-          swipeRight: gestureState.dx > SCREEN_WIDTH - 200,
-          swipeLeft: gestureState.dx < -SCREEN_WIDTH + 200,
+          swipeRight: gestureState.dx > SCREEN_WIDTH - SWIPE_TRIGGER,
+          swipeLeft: gestureState.dx < -SCREEN_WIDTH + SWIPE_TRIGGER,
         });
       },
       onPanResponderRelease: (evt, gestureState) => {
@@ -97,9 +95,6 @@ class SwipeableCard extends React.Component {
       outputRange: ['-20deg', '0deg', '20deg'],
     });
 
-    const { item } = this.props;
-    const { mediaIndex } = this.state;
-
     return (
       <Animated.View
         {...this.panResponder.panHandlers}
@@ -116,15 +111,7 @@ class SwipeableCard extends React.Component {
           this.state.delta.x > 0 ? styles.cardShadow : {},
         ]}
       >
-        <Image
-          source={{ uri: item.media[mediaIndex].url }}
-          style={{ width: '100%', height: '80%' }}
-        />
-        {item.thumbnail && (
-          <Image style={styles.image} source={{ uri: item.thumbnail.url }} />
-        )}
-        <Text style={styles.name}>{this.props.item.name}</Text>
-        <Text style={styles.tagline}>{this.props.item.tagline}</Text>
+        {this.props.children}
         {this.state.swipeLeft && (
           <Text style={styles.leftSwipe}>Left Swipe</Text>
         )}
@@ -140,31 +127,15 @@ const styles = StyleSheet.create({
   card: {
     width: '85%',
     height: '80%',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
     position: 'absolute',
-    borderRadius: 7,
+    borderRadius: 10,
     backgroundColor: '#ccc',
-    padding: 10,
   },
   cardShadow: {
     shadowColor: '#000',
     shadowOffset: { width: 5, height: 5 },
     shadowOpacity: 0.8,
     shadowRadius: 20,
-  },
-  image: {
-    width: 50,
-    height: 50,
-  },
-  name: {
-    color: '#fff',
-    fontSize: 36,
-    fontWeight: 'bold',
-  },
-  tagline: {
-    color: '#fff',
-    fontSize: 20,
   },
   leftSwipe: {
     top: 22,
