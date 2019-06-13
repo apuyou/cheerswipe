@@ -6,20 +6,46 @@ import gql from 'graphql-tag';
 import GoalCard from '../components/GoalCard';
 
 class HomeScreen extends React.Component {
+  state = {
+    removedGoals: [],
+    cursor: null,
+  };
+
   static navigationOptions = {
     header: null,
   };
 
+  getGoals = () => {
+    const { data } = this.props;
+    const { removedGoals } = this.state;
+
+    const goals = data.goals ? data.goals.edges.map(goals => goals.node) : null;
+
+    return goals && goals.filter(goal => removedGoals.indexOf(goal.id) === -1);
+  };
+
   removeCard = id => () => {
-    // this.setState(state => ({
-    //   cards: state.cards.filter(card => card.id !== id),
-    // }));
+    this.setState(
+      state => ({
+        removedGoals: [...state.removedGoals, id],
+      }),
+      this.fetchMore
+    );
+  };
+
+  fetchMore = () => {
+    const goals = this.getGoals();
+    if (goals.length === 0) {
+      if (this.props.data.goals.pageInfo.hasNextPage) {
+        this.props.data.refetch({
+          cursor: this.props.data.goals.pageInfo.startCursor,
+        });
+      }
+    }
   };
 
   render() {
-    const goals = this.props.data.goals
-      ? this.props.data.goals.edges.map(goals => goals.node)
-      : null;
+    const goals = this.getGoals();
 
     return (
       <View style={styles.container}>
@@ -29,11 +55,20 @@ class HomeScreen extends React.Component {
               <GoalCard item={item} />
             </SwipeableCard>
           ))}
-        {goals && goals.length === 0 && (
-          <Text style={{ fontSize: 22, color: '#000' }}>
-            No more goals to swipe
-          </Text>
-        )}
+        {goals &&
+          goals.length === 0 &&
+          !this.props.data.goals.pageInfo.hasNextPage && (
+            <Text style={{ fontSize: 22, color: '#000' }}>
+              No more goals to swipe
+            </Text>
+          )}
+        {goals &&
+          goals.length === 0 &&
+          this.props.data.goals.pageInfo.hasNextPage && (
+            <Text style={{ fontSize: 22, color: '#000' }}>
+              Loading more goals…
+            </Text>
+          )}
         {goals === null && (
           <Text style={{ fontSize: 22, color: '#000' }}>Loading…</Text>
         )}
@@ -52,25 +87,34 @@ const styles = StyleSheet.create({
   },
 });
 
-export default graphql(gql`
-  query {
-    goals(completed: false, last: 2) {
-      edges {
-        node {
-          title
-          id
-          cheerCount
-          user {
-            profileImage
-            coverImage
-            name
+export default graphql(
+  gql`
+    query Goals($cursor: String) {
+      goals(completed: false, first: 10, after: $cursor) {
+        edges {
+          node {
+            title
+            id
+            cheerCount
+            user {
+              profileImage
+              coverImage
+              name
+            }
           }
         }
-      }
-      pageInfo {
-        hasNextPage
-        startCursor
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
       }
     }
+  `,
+  {
+    options: {
+      variables: {
+        cursor: null,
+      },
+    },
   }
-`)(HomeScreen);
+)(HomeScreen);
