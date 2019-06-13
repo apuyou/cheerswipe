@@ -9,8 +9,14 @@ class GoalCard extends React.Component {
         {item.user.coverImage && (
           <Image style={styles.cover} source={{ uri: item.user.coverImage }} />
         )}
+        {this.props.swipeRight && <Text style={styles.rightSwipe}>Ignore</Text>}
         <View style={styles.content}>
-          <Text style={styles.cheerCount}>{this.props.item.cheerCount} 👏</Text>
+          <Text style={styles.cheerCount}>
+            {this.props.swipeLeft
+              ? this.props.item.cheerCount + 1
+              : this.props.item.cheerCount}{' '}
+            🙌🏼
+          </Text>
           <Text style={styles.title}>{this.props.item.title}</Text>
           <View style={styles.author}>
             <Image
@@ -65,6 +71,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
+  },
+  rightSwipe: {
+    top: 22,
+    left: 32,
+    position: 'absolute',
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    backgroundColor: 'transparent',
   },
 });
 

@@ -3,7 +3,6 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import SwipeableCard from '../components/SwipeableCard';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import GoalCard from '../components/GoalCard';
 
 class HomeScreen extends React.Component {
   state = {
@@ -51,9 +50,11 @@ class HomeScreen extends React.Component {
       <View style={styles.container}>
         {goals &&
           goals.map((item, key) => (
-            <SwipeableCard key={key} removeCard={this.removeCard(item.id)}>
-              <GoalCard item={item} />
-            </SwipeableCard>
+            <SwipeableCard
+              key={key}
+              removeCard={this.removeCard(item.id)}
+              item={item}
+            />
           ))}
         {goals &&
           goals.length === 0 &&
@@ -80,7 +81,7 @@ class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 20 : 0,

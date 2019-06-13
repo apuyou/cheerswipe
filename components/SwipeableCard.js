@@ -1,11 +1,6 @@
 import React from 'react';
-import {
-  Text,
-  StyleSheet,
-  Dimensions,
-  Animated,
-  PanResponder,
-} from 'react-native';
+import { StyleSheet, Dimensions, Animated, PanResponder } from 'react-native';
+import GoalCard from './GoalCard';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_TRIGGER = 250;
@@ -111,13 +106,11 @@ class SwipeableCard extends React.Component {
           this.state.delta.x > 0 ? styles.cardShadow : {},
         ]}
       >
-        {this.props.children}
-        {this.state.swipeLeft && (
-          <Text style={styles.leftSwipe}>Left Swipe</Text>
-        )}
-        {this.state.swipeRight && (
-          <Text style={styles.rightSwipe}>Right Swipe</Text>
-        )}
+        <GoalCard
+          item={this.props.item}
+          swipeRight={this.state.swipeRight}
+          swipeLeft={this.state.swipeLeft}
+        />
       </Animated.View>
     );
   }
@@ -129,31 +122,14 @@ const styles = StyleSheet.create({
     height: '80%',
     position: 'absolute',
     borderRadius: 10,
-    backgroundColor: '#ccc',
+    backgroundColor: '#333',
+    overflow: 'hidden',
   },
   cardShadow: {
     shadowColor: '#000',
     shadowOffset: { width: 5, height: 5 },
     shadowOpacity: 0.8,
     shadowRadius: 20,
-  },
-  leftSwipe: {
-    top: 22,
-    right: 32,
-    position: 'absolute',
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    backgroundColor: 'transparent',
-  },
-  rightSwipe: {
-    top: 22,
-    left: 32,
-    position: 'absolute',
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    backgroundColor: 'transparent',
   },
 });
 
