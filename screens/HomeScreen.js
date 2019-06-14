@@ -1,8 +1,9 @@
 import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import SwipeableCard from '../components/SwipeableCard';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import Constants from 'expo-constants';
 
 class HomeScreen extends React.Component {
   state = {
@@ -24,6 +25,10 @@ class HomeScreen extends React.Component {
   };
 
   removeCard = id => () => {
+    this.props.mutate({
+      variables: { id },
+    });
+
     this.setState(
       state => ({
         removedGoals: [...state.removedGoals, id],
@@ -88,34 +93,54 @@ const styles = StyleSheet.create({
   },
 });
 
-export default graphql(
-  gql`
-    query Goals($cursor: String) {
-      goals(completed: false, first: 10, after: $cursor) {
-        edges {
-          node {
-            title
-            id
-            cheerCount
-            user {
-              profileImage
-              coverImage
-              name
+export default compose(
+  graphql(
+    gql`
+      query Goals($cursor: String) {
+        goals(completed: false, first: 10, after: $cursor) {
+          edges {
+            node {
+              title
+              id
+              cheerCount
+              user {
+                profileImage
+                coverImage
+                name
+              }
             }
           }
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
         }
       }
-    }
-  `,
-  {
-    options: {
-      variables: {
-        cursor: null,
+    `,
+    {
+      options: {
+        variables: {
+          cursor: null,
+        },
       },
-    },
-  }
+    }
+  ),
+  graphql(
+    gql`
+      mutation Cheer($id: ID!, $client: String) {
+        goalCheer(input: { goalId: $id, clientMutationId: $client }) {
+          errors {
+            message
+          }
+        }
+      }
+    `,
+    {
+      options: {
+        variables: {
+          client: Constants.manifest.slug,
+        },
+      },
+    }
+  )
 )(HomeScreen);
