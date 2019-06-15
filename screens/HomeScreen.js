@@ -59,12 +59,13 @@ class HomeScreen extends React.Component {
   };
 
   async componentDidMount() {
-    const initialCursor = await AsyncStorage.getItem(STORAGE_CURSOR);
+    const initialCursor = (await AsyncStorage.getItem(STORAGE_CURSOR)) || '';
+    console.log(initialCursor);
     if (initialCursor !== null && this.state.initialCursor === null) {
       this.setState({ initialCursor });
     }
 
-    const removedGoals = await AsyncStorage.getItem(STORAGE_REMOVED);
+    const removedGoals = (await AsyncStorage.getItem(STORAGE_REMOVED)) || '[]';
     if (removedGoals !== null) {
       this.setState({ removedGoals: JSON.parse(removedGoals) });
     }
@@ -75,7 +76,7 @@ class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
-        {initialCursor && (
+        {initialCursor !== null && (
           <Query query={GET_GOALS} variables={{ cursor: initialCursor }}>
             {({ loading, error, data, fetchMore, refetch }) => {
               if (loading) {
