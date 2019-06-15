@@ -62,7 +62,7 @@ class SwipeableCard extends React.Component {
             { useNativeDriver: true }
           ).start(() => {
             this.setState({ swipeLeft: false, swipeRight: false }, () => {
-              this.props.removeCard();
+              this.props.removeCard(direction === SWIPE_LEFT);
             });
           });
         } else {
