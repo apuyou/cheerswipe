@@ -7,7 +7,9 @@ import {
   AsyncStorage,
   Text,
 } from 'react-native';
-import { AppLoading, Asset, Font, Icon, SecureStore } from 'expo';
+import { AppLoading } from 'expo';
+import { Asset } from 'expo-asset';
+import * as SecureStore from 'expo-secure-store';
 import ApolloClient from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { persistCache } from 'apollo-cache-persist';

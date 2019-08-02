@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, StyleSheet, View, Button } from 'react-native';
-import { SecureStore } from 'expo';
+import * as SecureStore from 'expo-secure-store';
 
 const KEY_ACCESS_TOKEN = 'KEY_ACCESS_TOKEN';
 
