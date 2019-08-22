@@ -22,7 +22,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "fr.puyou.cheerswipe",
-      "buildNumber": "5"
+      "buildNumber": "6"
     },
     "android": {
       "package": "fr.puyou.cheerswipe",
